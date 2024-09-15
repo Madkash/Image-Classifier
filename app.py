@@ -19,7 +19,7 @@ class App:
 
         self.camera = camera.Camera() 
 
-        #self.init gui()
+        self.init_gui()
 
         self.delay = 15
 
@@ -29,7 +29,50 @@ class App:
         self.window.mainloop()
 
     def init_gui(self):
-        self.canvas = tk.Canvas(self.window,)
+        self.canvas = tk.Canvas(self.window, width=self.camera.width, height=self.camera.height)
+        self.canvas.pack()
+
+        self.btn_toggle_auto = tk.Button(self.window, text="Auto Prediction", width=50, command=self.auto_predict_toggle)
+        self.btn_toggle_auto.pack(anchor=tk.CENTER, expand=True)
+
+        self.classname_one = simpledialog.askstring("Classname One", "Enter the name of the first class:", 
+                                                    parent=self.window)
+        
+        self.classname_two = simpledialog.askstring("Classroom Two", "Enter the name of the first class:",
+                                                    parent=self.window)
+        
+        self.btn_class_one = tk.Button(self.window, text=self.classname_one, width=50, command=lambda: self.save_for_class(1))
+        self.btn_class_one.pack(anchor=tk.CENTER, expand=True)
+
+        self.btn_class_two = tk.Button(self.window, text=self.classname_two, width=50, command=lambda: self.save_for_class(2))
+        self.btn_class_two.pack(anchor=tk.CENTER ,expand=True)
+
+        self.btn_train = tk.Button(self.window, text="Train Model", width=50, command=lambda: self.model.train_model(self.counters))
+        self.btn_train.pack(anchor=tk.CENTER, expand=True)
+
+        self.btn_predict = tk.Button(self.window, text="Predict", width=50, command= self.predict)
+        self.btn_predict.pack(anchor=tk.CENTER, expand=True)
+
+        self.btn_reset = tk.Button(self.window, text="Reset", width=50, command=self.reset)
+        self.btn_reset.pack(anchor=tk.CENTER, expand=True)
+
+        self.class_label = tk.Label(self.window, text="CLASS")
+        self.class_label.config(font=("Arial", 20))
+        self.class_label.pack(anchor=tk.CENTER, expand=True)
 
     def auto_predict_toggle(self):
         self.auto_predict = not self.auto_predict
+
+    def save_for_class(self, class_num):
+        ret, frame = self.camera.get_frame()
+        if not os.path.exists('1'):
+            os.mkdir('1')
+        if not os.path.exists('2'):
+            os.mkdir('2')
+
+        cv.imwrite(f'{class_num}/frame{self.counters[class_num - 1]}.jpg', cv.cvtColor(frame, cv.COLOR_RGB2GRAY))
+        img = PIL.Image.open(f'{class_num}/frame{self.counters[class_num - 1]}.jpg')
+        img.thumbnail((150, 150), PIL.Image.ANTIALIAS)
+        img.save(f'{class_num}/frame{self.counters[class_num - 1]}.jpg')
+
+        self.counters[class_num - 1] += 1
