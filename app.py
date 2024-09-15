@@ -4,6 +4,7 @@ import cv2 as cv
 import os
 import PIL.Image, PIL.ImageTk
 import camera
+import model
 
 class App:
 
@@ -13,7 +14,7 @@ class App:
 
         self.counters = [1,1]
 
-        #self.model =
+        self.model = model.Model()
 
         self.auto_predict = False
 
@@ -38,7 +39,7 @@ class App:
         self.classname_one = simpledialog.askstring("Classname One", "Enter the name of the first class:", 
                                                     parent=self.window)
         
-        self.classname_two = simpledialog.askstring("Classroom Two", "Enter the name of the first class:",
+        self.classname_two = simpledialog.askstring("Classroom Two", "Enter the name of the second class:",
                                                     parent=self.window)
         
         self.btn_class_one = tk.Button(self.window, text=self.classname_one, width=50, command=lambda: self.save_for_class(1))
@@ -72,7 +73,7 @@ class App:
 
         cv.imwrite(f'{class_num}/frame{self.counters[class_num - 1]}.jpg', cv.cvtColor(frame, cv.COLOR_RGB2GRAY))
         img = PIL.Image.open(f'{class_num}/frame{self.counters[class_num - 1]}.jpg')
-        img.thumbnail((150, 150), PIL.Image.ANTIALIAS)
+        img.thumbnail((150, 150), PIL.Image.Resampling.LANCZOS)
         img.save(f'{class_num}/frame{self.counters[class_num - 1]}.jpg')
 
         self.counters[class_num - 1] += 1
@@ -84,14 +85,13 @@ class App:
                 if os.path.isfile(file_path):
                     os.unlink(file_path)
 
-        self.counters[1, 1]
-        #self.model = model.Model()
+        self.counters = [1, 1]
+        self.model = model.Model()
         self.class_label.config(text='CLASS')
 
     def update(self):
         if self.auto_predict:
-            #self.predict()
-            pass
+            self.predict()
 
         ret, frame = self.camera.get_frame()
 
@@ -100,3 +100,15 @@ class App:
             self.canvas.create_image(0,0,image=self.photo ,anchor=tk.NW)
 
         self.window.after(self.delay, self.update)
+
+    def predict(self):
+        frame = self.camera.get_frame()
+        prediction = self.model.predict(frame)
+
+        if prediction == 1:
+            self.class_label.config(text=self.classname_one)
+            return self.classname_one
+        
+        if prediction == 2:
+            self.class_label.config(text=self.classname_two)
+            return self.classname_two
