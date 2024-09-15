@@ -31,7 +31,8 @@ class Model:
         print("Model succesfully trained")
 
     def predict(self, frame):
-        frame  = frame[1]cv.imwrite('frame.jpg', cv.cvtColor(cv.COLOR_RGB2GRAY))
+        frame  = frame[1]
+        cv.imwrite('frame.jpg', cv.cvtColor(cv.COLOR_RGB2GRAY))
         img = PIL.Image.open('frame.jpg')
         img.thumbnail((150, 150), PIL.Image.ANTIALIAS)
         img.save('frame.jpg')
