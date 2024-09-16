@@ -25,7 +25,25 @@ class Model:
             img_list = np.append(img_list, [img])
             class_list = np.append(class_list, 2)
 
-        img_list = img_list.reshape(counters[0] - 1 + counters[1] - 1, 16950)
+        for i in range(1, counters[2]):
+            img = cv.imread(f'3/frame{i}.jpg')[:,:,0]
+            img = img.reshape(16950)
+            img_list = np.append(img_list, [img])
+            class_list = np.append(class_list, 3)
+
+        for i in range(1, counters[3]):
+            img = cv.imread(f'4/frame{i}.jpg')[:,:,0]
+            img = img.reshape(16950)
+            img_list = np.append(img_list, [img])
+            class_list = np.append(class_list, 4)
+
+        for i in range(1, counters[4]):
+            img = cv.imread(f'5/frame{i}.jpg')[:,:,0]
+            img = img.reshape(16950)
+            img_list = np.append(img_list, [img])
+            class_list = np.append(class_list, 5)
+
+        img_list = img_list.reshape(counters[0] - 1 + counters[1] - 1 + counters[2] - 1 + counters[3] - 1 + counters[4] - 1, 16950)
         self.model.fit(img_list, class_list)
 
         print("Model succesfully trained")
